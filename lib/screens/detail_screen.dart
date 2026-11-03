@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/destination.dart';
 import '../widgets/favorite_button.dart';
+import 'reservation_screen.dart';
 
 class DetailScreen extends StatefulWidget {
   final Destination destination;
@@ -37,7 +38,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   child: _BoutonRond(
                     child: IconButton(
                       tooltip: 'Retour',
-                      onPressed: () => Navigator.pop(context), // TP4 palier 2 : TODO 2
+                      onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back),
                     ),
                   ),
@@ -158,7 +159,6 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                   ],
                 ),
-
               ],
             ),
           ),
@@ -186,7 +186,18 @@ class _DetailScreenState extends State<DetailScreen> {
               const SizedBox(width: 20),
               Expanded(
                 child: FilledButton(
-                  onPressed: () {}, // TP4 palier 3 puis 5
+                  // Palier 3 : ouvre le formulaire de réservation
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReservationScreen(
+                          destination: d,
+                          voyageurs: _voyageurs,
+                        ),
+                      ),
+                    );
+                  },
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(56),
                   ),
