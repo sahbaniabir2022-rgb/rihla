@@ -30,9 +30,7 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
       ),
     );
-    // TODO 3 : retour sans valider -> on s'arrête
     if (reservation == null) return;
-    // TODO 4 : écran plus affiché -> on s'arrête
     if (!mounted) return;
 
     await showDialog<void>(
@@ -40,7 +38,6 @@ class _DetailScreenState extends State<DetailScreen> {
       builder: (context) => AlertDialog(
         icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
         title: const Text('Réservation confirmée'),
-        // TODO 5
         content: Text(
           '${reservation.nom}, votre voyage à ${reservation.destination.nom} '
           'est réservé.\n\n'
@@ -74,7 +71,11 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.asset(d.image, fit: BoxFit.cover),
+                // Palier 6 : Hero (même tag que dans DestinationCard)
+                Hero(
+                  tag: 'image-${d.nom}',
+                  child: Image.asset(d.image, fit: BoxFit.cover),
+                ),
                 Positioned(
                   top: 48,
                   left: 16,
