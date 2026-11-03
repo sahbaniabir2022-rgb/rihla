@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../models/destination.dart';
+import '../models/reservation.dart';
 import '../widgets/favorite_button.dart';
 import 'reservation_screen.dart';
 
+/// Devoir TP3 — Écran de détail d'une destination (version du kit TP4).
+/// À relier aux cartes au palier 2 du TP4.
 class DetailScreen extends StatefulWidget {
   final Destination destination;
 
@@ -15,6 +18,46 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   int _voyageurs = 1;
+
+  // Palier 5 : ouvre le formulaire, attend la réservation, puis confirme
+  Future<void> _reserver() async {
+    final reservation = await Navigator.push<Reservation>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ReservationScreen(
+          destination: widget.destination,
+          voyageurs: _voyageurs,
+        ),
+      ),
+    );
+    // TODO 3 : retour sans valider -> on s'arrête
+    if (reservation == null) return;
+    // TODO 4 : écran plus affiché -> on s'arrête
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
+        title: const Text('Réservation confirmée'),
+        // TODO 5
+        content: Text(
+          '${reservation.nom}, votre voyage à ${reservation.destination.nom} '
+          'est réservé.\n\n'
+          'Voyageurs : ${reservation.voyageurs}\n'
+          'Formule : ${reservation.formule}\n'
+          'Total : ${reservation.total} DT\n'
+          'Confirmation envoyée à ${reservation.email}',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Parfait'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,18 +229,7 @@ class _DetailScreenState extends State<DetailScreen> {
               const SizedBox(width: 20),
               Expanded(
                 child: FilledButton(
-                  // Palier 3 : ouvre le formulaire de réservation
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReservationScreen(
-                          destination: d,
-                          voyageurs: _voyageurs,
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: _reserver,
                   style: FilledButton.styleFrom(
                     minimumSize: const Size.fromHeight(56),
                   ),

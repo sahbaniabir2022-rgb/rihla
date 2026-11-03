@@ -22,24 +22,24 @@ class _ReservationScreenState extends State<ReservationScreen> {
   final _nomCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _telCtrl = TextEditingController();
-  final _dateCtrl = TextEditingController(); // P4
+  final _dateCtrl = TextEditingController();
 
-  DateTime? _date; // P4 : null tant qu'aucune date n'est choisie
-  String _formule = 'Essentiel'; // P4
-  bool _conditions = false; // P4
-  AutovalidateMode _autoValidation = AutovalidateMode.disabled; // P4
+  DateTime? _date; // null tant qu'aucune date n'est choisie
+  String _formule = 'Essentiel';
+  bool _conditions = false;
+  AutovalidateMode _autoValidation = AutovalidateMode.disabled;
 
   int get _prixParPersonne => _formule == 'Confort'
       ? (widget.destination.prix * 1.3).round()
-      : widget.destination.prix; // P4
-  int get _total => _prixParPersonne * widget.voyageurs; // P4
+      : widget.destination.prix;
+  int get _total => _prixParPersonne * widget.voyageurs;
 
   @override
   void dispose() {
     _nomCtrl.dispose();
     _emailCtrl.dispose();
     _telCtrl.dispose();
-    _dateCtrl.dispose(); // P4
+    _dateCtrl.dispose();
     super.dispose();
   }
 
@@ -75,7 +75,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
     return null;
   }
 
-  // P4 : 4.1 la date de départ
   Future<void> _choisirDate() async {
     final demain = DateTime.now().add(const Duration(days: 1));
     final choisie = await showDatePicker(
@@ -85,9 +84,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       helpText: 'Date de départ',
     );
-    // TODO 1 : annulation -> ne rien faire
     if (choisie == null) return;
-    // TODO 2 : mémoriser la date et l'afficher en jj/mm/aaaa
     setState(() {
       _date = choisie;
       _dateCtrl.text = '${choisie.day.toString().padLeft(2, '0')}/'
@@ -96,16 +93,24 @@ class _ReservationScreenState extends State<ReservationScreen> {
     });
   }
 
+  // Palier 5 : renvoie la réservation à l'écran précédent
   void _valider() {
     if (!_formKey.currentState!.validate()) {
-      // P4 : après un premier échec, les erreurs se mettent à jour pendant la saisie
       setState(() => _autoValidation = AutovalidateMode.onUserInteraction);
       return;
     }
-    // Provisoire : sera remplacé au palier 5
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Formulaire valide')),
+    final reservation = Reservation(
+      // TODO 1
+      destination: widget.destination,
+      nom: _nomCtrl.text.trim(),
+      email: _emailCtrl.text.trim(),
+      telephone: _telCtrl.text.trim(),
+      date: _date!,
+      voyageurs: widget.voyageurs,
+      formule: _formule,
     );
+    // TODO 2 : ferme l'écran ET renvoie la réservation
+    Navigator.pop(context, reservation);
   }
 
   @override
@@ -118,7 +123,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
       appBar: AppBar(title: const Text('Réserver')),
       body: Form(
         key: _formKey,
-        autovalidateMode: _autoValidation, // P4
+        autovalidateMode: _autoValidation,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -188,21 +193,19 @@ class _ReservationScreenState extends State<ReservationScreen> {
                 validator: _validerTel,
               ),
               const SizedBox(height: 24),
-              // P4 : titre + date
               Text('Votre voyage',
                   style: theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _dateCtrl,
-                readOnly: true, // pas de clavier
-                onTap: _choisirDate, // on ouvre le calendrier
+                readOnly: true,
+                onTap: _choisirDate,
                 decoration:
                     _deco('Date de départ', Icons.calendar_month_outlined),
                 validator: (_) => _date == null ? 'Choisissez une date' : null,
               ),
               const SizedBox(height: 16),
-              // P4 : 4.2 la formule
               SegmentedButton<String>(
                 segments: const [
                   ButtonSegment(
@@ -214,14 +217,12 @@ class _ReservationScreenState extends State<ReservationScreen> {
                       label: Text('Confort +30 %'),
                       icon: Icon(Icons.hotel_outlined)),
                 ],
-                selected: {_formule}, // un Set : ici un seul élément
+                selected: {_formule},
                 onSelectionChanged: (choix) {
-                  // TODO 3
                   setState(() => _formule = choix.first);
                 },
               ),
               const SizedBox(height: 8),
-              // P4 : les conditions
               CheckboxListTile(
                 value: _conditions,
                 onChanged: (v) => setState(() => _conditions = v ?? false),
@@ -234,7 +235,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
           ),
         ),
       ),
-      // P4 : barre du bas avec le prix et le bouton désactivable
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -260,7 +260,7 @@ class _ReservationScreenState extends State<ReservationScreen> {
               const SizedBox(width: 20),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: _conditions ? _valider : null, // null = grisé
+                  onPressed: _conditions ? _valider : null,
                   icon: const Icon(Icons.check),
                   label: const Text('Confirmer'),
                   style: FilledButton.styleFrom(
@@ -288,15 +288,25 @@ class _ReservationScreenState extends State<ReservationScreen> {
 // Q3 (palier 3). Un TextEditingController garde des ressources et des
 //     écouteurs en mémoire. Sans dispose(), ils restent alloués : fuite mémoire.
 //
-// Q1 (palier 4). Le champ date est en readOnly pour que l'utilisateur ne puisse
-//     pas taper du texte libre : il doit passer par le calendrier, qui garantit
-//     une date valide, au bon format et comprise entre demain et un an (firstDate
-//     / lastDate). Sinon on pourrait saisir « abc » ou une date passée, et le
-//     texte affiché ne correspondrait plus à _date (resté null), donc le
-//     validator et le champ se contrediraient. De plus, le clavier s'ouvrirait
-//     pour rien.
-// Q2 (palier 4). _total est un getter : il n'a pas de valeur stockée, il
-//     recalcule _prixParPersonne * voyageurs à chaque lecture à partir de
-//     _formule. Quand setState change _formule, build() est rappelé et lit
-//     de nouveau le getter, donc le prix affiché est toujours à jour, sans
-//     variable à synchroniser (pas de risque d'oublier de la mettre à jour).
+// Q1 (palier 4). Le champ date est en readOnly pour que l'utilisateur passe par
+//     le calendrier, qui garantit une date valide, au bon format et comprise
+//     entre demain et un an. Sinon on pourrait saisir du texte libre ou une
+//     date passée, et le texte affiché ne correspondrait plus à _date (resté
+//     null) : le validator et le champ se contrediraient.
+// Q2 (palier 4). _total est un getter : il recalcule _prixParPersonne * voyageurs
+//     à chaque lecture à partir de _formule. Quand setState change _formule,
+//     build() est rappelé et relit le getter : le prix affiché est toujours à
+//     jour, sans variable à synchroniser.
+//
+// Q1 (palier 5). Si l'utilisateur quitte avec la flèche retour, Navigator.pop
+//     est appelé sans valeur : le Future de Navigator.push se termine avec
+//     null. C'est pourquoi reservation est de type Reservation? et qu'on teste
+//     « == null ».
+// Q2 (palier 5). VS Code affiche « Don't use 'BuildContext's across async
+//     gaps » (use_build_context_synchronously). Après un await, l'écran a pu
+//     être fermé : le context peut ne plus être valide. mounted indique si le
+//     State est toujours dans l'arbre ; on n'utilise le context (showDialog)
+//     que s'il l'est.
+// Q3 (palier 5). Une boîte de dialogue est une route empilée sur le Navigator,
+//     comme un écran. On la ferme donc avec Navigator.pop, et showDialog
+//     renvoie un Future qui se termine à sa fermeture (comme push/pop).
