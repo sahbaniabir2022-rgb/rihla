@@ -38,7 +38,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   child: _BoutonRond(
                     child: IconButton(
                       tooltip: 'Retour',
-                      onPressed: () {}, // TP4 palier 2
+                      onPressed: () => Navigator.pop(context), // TP4 palier 2 : TODO 2
                       icon: const Icon(Icons.arrow_back),
                     ),
                   ),
