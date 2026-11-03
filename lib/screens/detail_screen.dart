@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/destination.dart';
 import '../widgets/favorite_button.dart';
-/// Devoir TP3 — Écran de détail d'une destination (version du kit TP4).
-/// À relier aux cartes au palier 2 du TP4.
+
 class DetailScreen extends StatefulWidget {
   final Destination destination;
 
