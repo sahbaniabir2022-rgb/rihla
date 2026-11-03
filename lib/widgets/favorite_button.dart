@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
+
 class FavoriteButton extends StatefulWidget {
-  const FavoriteButton({super.key});
+  final bool initial;
+  final ValueChanged<bool>? onChanged;
+
+  const FavoriteButton({
+    super.key,
+    this.initial = false,
+    this.onChanged,
+  });
 
   @override
   State<FavoriteButton> createState() => _FavoriteButtonState();
 }
 
 class _FavoriteButtonState extends State<FavoriteButton> {
-  bool _favori = false;                              // TODO 1
+  late bool _favori = widget.initial;
 
   void _basculer() {
-    setState(() => _favori = !_favori);              // TODO 2
+    setState(() => _favori = !_favori);
+    widget.onChanged?.call(_favori);
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -22,7 +31,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(                               // TODO 3
+    return IconButton(
       onPressed: _basculer,
       icon: Icon(
         _favori ? Icons.favorite : Icons.favorite_border,
