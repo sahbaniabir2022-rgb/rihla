@@ -117,7 +117,6 @@ class DestinationCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Palier 6 : le bouton favori (son état est local)
               const FavoriteButton(),
             ],
           ),

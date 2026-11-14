@@ -1,9 +1,14 @@
 
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'package:flutter/scheduler.dart';
 
 void main() {
+ 
   runApp(const RihlaApp());
+
+   // test seulement
+
 }
 
 class RihlaApp extends StatelessWidget {

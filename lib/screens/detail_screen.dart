@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../models/avis.dart';
 import '../models/destination.dart';
 import '../models/reservation.dart';
 import '../widgets/favorite_button.dart';
+import 'avis_screen.dart';
 import 'reservation_screen.dart';
 
 /// Devoir TP3 — Écran de détail d'une destination (version du kit TP4).
-/// À relier aux cartes au palier 2 du TP4.
 class DetailScreen extends StatefulWidget {
   final Destination destination;
 
@@ -19,7 +20,9 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   int _voyageurs = 1;
 
-  // Palier 5 : ouvre le formulaire, attend la réservation, puis confirme
+  // Liste des avis : maintenant DANS la classe State
+  final List<Avis> _avis = [];
+
   Future<void> _reserver() async {
     final reservation = await Navigator.push<Reservation>(
       context,
@@ -53,6 +56,25 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  // Ouvre AvisScreen, attend le résultat, l'ajoute à la liste
+  Future<void> _laisserAvis() async {
+    final Avis? avis = await Navigator.push<Avis>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AvisScreen(destination: widget.destination),
+      ),
+    );
+
+    if (!mounted) return;      // écran fermé pendant l'attente
+    if (avis == null) return;  // flèche retour : rien à ajouter
+
+    setState(() => _avis.insert(0, avis)); // en tête de liste
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Merci pour votre avis !')),
     );
   }
 
@@ -203,6 +225,59 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                   ],
                 ),
+
+                // ===== Partie avis (Checkpoint 1) =====
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Avis (${_avis.length})',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    TextButton.icon(
+                      onPressed: _laisserAvis,
+                      icon: const Icon(Icons.rate_review_outlined),
+                      label: const Text('Laisser un avis'),
+                    ),
+                  ],
+                ),
+                if (_avis.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Soyez le premier à donner votre avis.',
+                      style: TextStyle(color: cs.onSurfaceVariant),
+                    ),
+                  )
+                else
+                  ..._avis.map(
+                    (a) => ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        child: Text(a.auteur[0].toUpperCase()),
+                      ),
+                      title: Text(a.auteur),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: List.generate(
+                              5,
+                              (i) => Icon(
+                                i < a.note ? Icons.star : Icons.star_border,
+                                size: 16,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(a.commentaire),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
