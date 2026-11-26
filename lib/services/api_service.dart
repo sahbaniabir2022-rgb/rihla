@@ -1,15 +1,18 @@
+
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
 import '../config/api_config.dart';
 import '../models/destination.dart';
+import '../models/reservation.dart';
 
 class ApiService {
   static Uri _url(String chemin) {
     return Uri.parse('${ApiConfig.baseUrl}$chemin');
   }
 
+  // Récupérer toutes les destinations
   static Future<List<Destination>> getDestinations() async {
     final reponse = await http
         .get(_url('/destinations'))
@@ -30,7 +33,33 @@ class ApiService {
             ))
         .toList();
   }
+
+  // Créer une réservation et l'envoyer au serveur
+  static Future<String> creerReservation(
+      Reservation reservation) async {
+    final reponse = await http
+        .post(
+          _url('/reservations'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(reservation.toJson()),
+        )
+        .timeout(ApiConfig.timeout);
+
+if (reponse.statusCode != 201) {
+  throw Exception(
+    'Erreur serveur : ${reponse.statusCode}',
+  );
 }
+
+    final Map<String, dynamic> creee =
+        jsonDecode(utf8.decode(reponse.bodyBytes));
+
+    return creee['id'].toString();
+  }
+}
+
 // Questions de compréhension
 
 // 1. Pourquoi fromJson est-il un constructeur factory ?
@@ -41,6 +70,6 @@ class ApiService {
 // Une erreur de type se produit, car "420" est une String
 // et non un num. Le cast (json['prix'] as num) échoue.
 
-// 3. Pourquoi la méthode renvoie-t-elle un Future<List<Destination>> ?
+// 3. Pourquoi getDestinations renvoie-t-elle un Future<List<Destination>> ?
 // Parce que la requête HTTP est asynchrone et prend du temps.
 // Future indique que la liste sera disponible après la réponse du serveur.

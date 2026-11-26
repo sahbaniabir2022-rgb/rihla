@@ -6,6 +6,7 @@ import '../models/reservation.dart';
 import '../widgets/favorite_button.dart';
 import 'avis_screen.dart';
 import 'reservation_screen.dart';
+import '../services/api_service.dart';
 
 /// Devoir TP3 — Écran de détail d'une destination (version du kit TP4).
 class DetailScreen extends StatefulWidget {
@@ -33,30 +34,55 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
       ),
     );
+
     if (reservation == null) return;
     if (!mounted) return;
 
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
-        title: const Text('Réservation confirmée'),
-        content: Text(
-          '${reservation.nom}, votre voyage à ${reservation.destination.nom} '
-          'est réservé.\n\n'
-          'Voyageurs : ${reservation.voyageurs}\n'
-          'Formule : ${reservation.formule}\n'
-          'Total : ${reservation.total} DT\n'
-          'Confirmation envoyée à ${reservation.email}',
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Parfait'),
+    try {
+      // Envoyer la réservation au serveur
+      final id = await ApiService.creerReservation(reservation);
+
+      if (!mounted) return;
+
+      // Afficher la confirmation avec l'identifiant du serveur
+      await showDialog<void>(
+        context: context,
+        builder: (context) => AlertDialog(
+          icon: const Icon(
+            Icons.check_circle,
+            color: Colors.green,
+            size: 48,
           ),
-        ],
-      ),
-    );
+          title: const Text('Réservation confirmée'),
+          content: Text(
+            '${reservation.nom}, votre voyage à '
+            '${reservation.destination.nom} est réservé.\n\n'
+            'N° de réservation : $id\n'
+            'Voyageurs : ${reservation.voyageurs}\n'
+            'Formule : ${reservation.formule}\n'
+            'Total : ${reservation.total} DT\n'
+            'Confirmation envoyée à ${reservation.email}',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Parfait'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Envoi impossible : json-server est-il lancé ?',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   // Ouvre AvisScreen, attend le résultat, l'ajoute à la liste
@@ -68,10 +94,10 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
     );
 
-    if (!mounted) return;      // écran fermé pendant l'attente
-    if (avis == null) return;  // flèche retour : rien à ajouter
+    if (!mounted) return;
+    if (avis == null) return;
 
-    setState(() => _avis.insert(0, avis)); // en tête de liste
+    setState(() => _avis.insert(0, avis));
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Merci pour votre avis !')),
@@ -136,11 +162,18 @@ class _DetailScreenState extends State<DetailScreen> {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(Icons.place_outlined,
-                                  size: 18, color: cs.onSurfaceVariant),
+                              Icon(
+                                Icons.place_outlined,
+                                size: 18,
+                                color: cs.onSurfaceVariant,
+                              ),
                               const SizedBox(width: 4),
-                              Text(d.region,
-                                  style: TextStyle(color: cs.onSurfaceVariant)),
+                              Text(
+                                d.region,
+                                style: TextStyle(
+                                  color: cs.onSurfaceVariant,
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -148,7 +181,9 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: cs.secondaryContainer,
                         borderRadius: BorderRadius.circular(12),
@@ -156,12 +191,18 @@ class _DetailScreenState extends State<DetailScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.star_rounded,
-                              color: Colors.amber, size: 20),
+                          const Icon(
+                            Icons.star_rounded,
+                            color: Colors.amber,
+                            size: 20,
+                          ),
                           const SizedBox(width: 4),
-                          Text('${d.note}',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                            '${d.note}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -172,38 +213,52 @@ class _DetailScreenState extends State<DetailScreen> {
                   children: [
                     Expanded(
                       child: _InfoTile(
-                          icone: Icons.schedule, label: 'Durée', valeur: d.duree),
+                        icone: Icons.schedule,
+                        label: 'Durée',
+                        valeur: d.duree,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: _InfoTile(
-                          icone: Icons.category_outlined,
-                          label: 'Type',
-                          valeur: d.categorie),
+                        icone: Icons.category_outlined,
+                        label: 'Type',
+                        valeur: d.categorie,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     const Expanded(
                       child: _InfoTile(
-                          icone: Icons.groups_outlined,
-                          label: 'Groupe',
-                          valeur: 'Max 12'),
+                        icone: Icons.groups_outlined,
+                        label: 'Groupe',
+                        valeur: 'Max 12',
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                Text('À propos',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'À propos',
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
-                Text(d.description,
-                    style: TextStyle(height: 1.5, color: cs.onSurfaceVariant)),
+                Text(
+                  d.description,
+                  style: TextStyle(
+                    height: 1.5,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
                 const SizedBox(height: 24),
                 Row(
                   children: [
                     Expanded(
-                      child: Text('Voyageurs',
-                          style: theme.textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold)),
+                      child: Text(
+                        'Voyageurs',
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
                     ),
                     IconButton.outlined(
                       onPressed: _voyageurs > 1
@@ -292,7 +347,10 @@ class _DetailScreenState extends State<DetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Total', style: TextStyle(color: cs.onSurfaceVariant)),
+                  Text(
+                    'Total',
+                    style: TextStyle(color: cs.onSurfaceVariant),
+                  ),
                   Text(
                     '${d.prix * _voyageurs} DT',
                     style: theme.textTheme.headlineSmall?.copyWith(
@@ -362,8 +420,17 @@ class _InfoTile extends StatelessWidget {
         children: [
           Icon(icone, color: cs.primary),
           const SizedBox(height: 6),
-          Text(label, style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
-          Text(valeur, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+          Text(
+            valeur,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
