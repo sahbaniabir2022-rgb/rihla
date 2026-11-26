@@ -68,3 +68,10 @@ const List<Destination> destinations = [
         'Amphithéâtre romain parmi les mieux conservés au monde, classé au patrimoine de l\'UNESCO.',
   ),
 ];
+
+const List<String> categories = [
+  'Tout',
+  'Plage',
+  'Désert',
+  'Patrimoine',
+];

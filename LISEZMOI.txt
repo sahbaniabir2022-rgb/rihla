@@ -1,0 +1,16 @@
+Kit TP5 — Rihla : consommer une API REST
+
+À copier dans votre projet Rihla (celui du TP4) :
+
+  api/db.json                   À placer à la RACINE du projet (à côté de lib/).
+                                Données du serveur json-server : 6 destinations,
+                                aucune réservation.
+  lib/config/api_config.dart    Adresse du serveur selon la plateforme
+                                (Chrome/Windows, émulateur Android, téléphone).
+
+Lancer le serveur (laisser ce terminal ouvert) :
+  cd api
+  npx json-server db.json
+
+Puis ouvrir http://localhost:3000/destinations dans le navigateur.
+Prérequis : Node.js 18 ou plus (node -v).

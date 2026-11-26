@@ -100,7 +100,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
       return;
     }
     final reservation = Reservation(
-      // TODO 1
       destination: widget.destination,
       nom: _nomCtrl.text.trim(),
       email: _emailCtrl.text.trim(),
@@ -109,7 +108,6 @@ class _ReservationScreenState extends State<ReservationScreen> {
       voyageurs: widget.voyageurs,
       formule: _formule,
     );
-    // TODO 2 : ferme l'écran ET renvoie la réservation
     Navigator.pop(context, reservation);
   }
 
