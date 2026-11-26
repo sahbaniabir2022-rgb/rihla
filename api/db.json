@@ -9,7 +9,7 @@
       "note": 4.9,
       "prix": 180,
       "duree": "1 jour",
-      "description": "Village perché au-dessus du golfe de Tunis, célèbre pour ses maisons blanches aux portes bleues, ses ruelles fleuries et le café des Délices."
+      "description": "Village perché au-dessus du golfe de Tunis."
     },
     {
       "id": "2",
@@ -20,7 +20,7 @@
       "note": 4.8,
       "prix": 420,
       "duree": "4 jours",
-      "description": "L'île des rêves : plages de sable fin, eaux turquoise, villages traditionnels et la Djerba Explore pour toute la famille."
+      "description": "L'île des rêves : plages de sable fin et eaux turquoise."
     },
     {
       "id": "3",
@@ -31,7 +31,7 @@
       "note": 4.7,
       "prix": 350,
       "duree": "3 jours",
-      "description": "Porte du Sahara : palmeraie de plus de 400 000 palmiers, médina en briques ocre et couchers de soleil sur le chott El Djérid."
+      "description": "Porte du Sahara et sa grande palmeraie."
     },
     {
       "id": "4",
@@ -42,7 +42,7 @@
       "note": 4.8,
       "prix": 120,
       "duree": "1 jour",
-      "description": "L'un des plus grands amphithéâtres romains au monde, inscrit au patrimoine mondial de l'UNESCO, et son festival de musique symphonique."
+      "description": "Un grand amphithéâtre romain."
     },
     {
       "id": "5",
@@ -53,7 +53,7 @@
       "note": 4.6,
       "prix": 390,
       "duree": "3 jours",
-      "description": "Balade à dos de dromadaire, nuit sous tente et dunes à perte de vue : l'expérience saharienne par excellence."
+      "description": "Une expérience saharienne au milieu des dunes."
     },
     {
       "id": "6",
@@ -64,12 +64,12 @@
       "note": 4.5,
       "prix": 260,
       "duree": "2 jours",
-      "description": "Médina fortifiée au bord de la mer, jardins de jasmin et longues plages : la station balnéaire historique du Cap Bon."
+      "description": "Médina fortifiée et longues plages."
     },
     {
-      "title": "Préparer le TP MEAN Stack",
-      "done": false,
-      "id": "YeaOlctYejI"
+      "email": "client.test@example.com",
+      "password": "$2b$10$D1tSI0cbyFIdrXxifwLIOgbjioOL1kmX0QQzybuxn4U4W6OpaZoK",
+      "id": "IiTdLqdHq8o"
     },
     {
       "destinationId": "2",
@@ -80,38 +80,9 @@
       "voyageurs": 2,
       "formule": "Confort",
       "total": 1092,
-      "id": "tIqB_XqTgNg"
+      "id": "slHhJr5gnVE"
     }
   ],
-  "reservations": [
-    {
-      "destinationId": "2",
-      "nom": "Test",
-      "email": "test@mail.tn",
-      "telephone": "22123456",
-      "dateDepart": "2026-12-15T00:00:00.000",
-      "voyageurs": 2,
-      "formule": "Confort",
-      "total": 1092,
-      "id": "LXz6Ptu7UcU"
-    },
-    {
-      "id": "V3wO_uD6_e0"
-    },
-    {
-      "id": "r1S341QLky8"
-    },
-    {
-      "destinationId": "2",
-      "nom": "Test",
-      "email": "test@mail.tn",
-      "telephone": "22123456",
-      "dateDepart": "2026-12-15T00:00:00.000",
-      "voyageurs": 2,
-      "formule": "Confort",
-      "total": 1092,
-      "id": "Okwc1aUIAb0"
-    }
-  ],
+  "reservations": [],
   "$schema": "./node_modules/json-server/schema.json"
 }
