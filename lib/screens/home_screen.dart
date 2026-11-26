@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 import '../models/destination.dart';
@@ -8,6 +9,9 @@ import '../widgets/search_box.dart';
 import '../widgets/hero_banner.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/section_title.dart';
+import '../widgets/erreur_reseau.dart';
+
+import 'mes_reservations_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String _categorie = 'Tout';
   int _onglet = 0;
 
-  // Future qui contient les destinations reçues du serveur
   late Future<List<Destination>> _futurDestinations;
 
   final List<String> _categories = [
@@ -33,12 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
-    // On lance la requête une seule fois
     _futurDestinations = ApiService.getDestinations();
   }
 
-  // Filtrer les destinations selon la catégorie
+  // Filtrer les destinations
   List<Destination> _filtrer(List<Destination> toutes) {
     if (_categorie == 'Tout') {
       return toutes;
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await futur;
     } catch (_) {
-      // L'erreur sera affichée par FutureBuilder
+      // L'erreur sera affichée par FutureBuilder.
     }
   }
 
@@ -82,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 24),
 
-          // Bannière seulement si la liste n'est pas vide
           if (destinations.isNotEmpty)
             HeroBanner(destination: destinations.first),
 
@@ -92,7 +92,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 12),
 
-          // Les catégories
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -124,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 12),
 
-          // Aucune destination
           if (destinations.isEmpty)
             const Center(
               child: Padding(
@@ -132,16 +130,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text('Aucune destination disponible.'),
               ),
             )
-
-          // Aucune destination dans cette catégorie
           else if (filtrees.isEmpty)
             const Center(
               child: Text(
                 'Aucune destination dans cette catégorie.',
               ),
             )
-
-          // Afficher les destinations
           else
             ...filtrees.map(
               (d) => DestinationCard(
@@ -154,21 +148,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Charger les destinations avec FutureBuilder
+  // Charger les destinations
   Widget _construireExplorer() {
     return FutureBuilder<List<Destination>>(
       future: _futurDestinations,
-
       builder: (context, snapshot) {
-
-        // État 1 : chargement
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        // État 2 : erreur
         if (snapshot.hasError) {
           return ErreurReseau(
             message: 'Impossible de charger les destinations.',
@@ -176,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
-        // État 3 : données reçues
         final destinations = snapshot.data ?? [];
 
         return _construireAccueil(destinations);
@@ -190,21 +179,21 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: _onglet == 0
             ? _construireExplorer()
-            : const Center(
-                child: Text('Bientôt disponible'),
-              ),
+            : _onglet == 1
+                ? const Center(
+                    child: Text('Bientôt disponible'),
+                  )
+                : const MesReservationsScreen(),
       ),
 
-      // Garder la navigation existante
+      // Navigation principale
       bottomNavigationBar: NavigationBar(
         selectedIndex: _onglet,
-
         onDestinationSelected: (index) {
           setState(() {
             _onglet = index;
           });
         },
-
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.explore_outlined),
@@ -217,66 +206,11 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Favoris',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profil',
+            icon: Icon(Icons.luggage_outlined),
+            selectedIcon: Icon(Icons.luggage),
+            label: 'Voyages',
           ),
         ],
-      ),
-    );
-  }
-}
-
-// Widget affiché en cas d'erreur réseau
-class ErreurReseau extends StatelessWidget {
-  final String message;
-  final VoidCallback onReessayer;
-
-  const ErreurReseau({
-    super.key,
-    required this.message,
-    required this.onReessayer,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final couleurErreur = Theme.of(context).colorScheme.error;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.cloud_off,
-              size: 60,
-              color: couleurErreur,
-            ),
-
-            const SizedBox(height: 16),
-
-            Text(
-              message,
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 8),
-
-            const Text(
-              'Vérifiez que json-server est lancé.',
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 20),
-
-            FilledButton.tonalIcon(
-              onPressed: onReessayer,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Réessayer'),
-            ),
-          ],
-        ),
       ),
     );
   }

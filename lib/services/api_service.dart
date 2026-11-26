@@ -12,7 +12,7 @@ class ApiService {
     return Uri.parse('${ApiConfig.baseUrl}$chemin');
   }
 
-  // Récupérer toutes les destinations
+  // 1. Récupérer toutes les destinations
   static Future<List<Destination>> getDestinations() async {
     final reponse = await http
         .get(_url('/destinations'))
@@ -34,7 +34,29 @@ class ApiService {
         .toList();
   }
 
-  // Créer une réservation et l'envoyer au serveur
+  // 2. Récupérer les réservations avec leurs destinations
+  static Future<List<Reservation>> getReservations() async {
+    final reponse = await http
+        .get(_url('/reservations?_embed=destination'))
+        .timeout(ApiConfig.timeout);
+
+    if (reponse.statusCode != 200) {
+      throw Exception(
+        'Erreur serveur : ${reponse.statusCode}',
+      );
+    }
+
+    final List<dynamic> liste =
+        jsonDecode(utf8.decode(reponse.bodyBytes));
+
+    return liste
+        .map((element) => Reservation.fromJson(
+              element as Map<String, dynamic>,
+            ))
+        .toList();
+  }
+
+  // 3. Créer une réservation et l'envoyer au serveur
   static Future<String> creerReservation(
       Reservation reservation) async {
     final reponse = await http
@@ -47,11 +69,11 @@ class ApiService {
         )
         .timeout(ApiConfig.timeout);
 
-if (reponse.statusCode != 201) {
-  throw Exception(
-    'Erreur serveur : ${reponse.statusCode}',
-  );
-}
+    if (reponse.statusCode != 201) {
+      throw Exception(
+        'Erreur serveur : ${reponse.statusCode}',
+      );
+    }
 
     final Map<String, dynamic> creee =
         jsonDecode(utf8.decode(reponse.bodyBytes));

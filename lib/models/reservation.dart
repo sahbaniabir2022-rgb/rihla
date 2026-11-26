@@ -26,7 +26,21 @@ class Reservation {
       : destination.prix;
 
   int get total => prixParPersonne * voyageurs;
-
+  // Créer une réservation à partir des données JSON
+  factory Reservation.fromJson(Map<String, dynamic> json) {
+    return Reservation(
+      id: json['id']?.toString(),
+      destination: Destination.fromJson(
+        json['destination'] as Map<String, dynamic>,
+      ),
+      nom: json['nom'],
+      email: json['email'],
+      telephone: json['telephone'],
+      date: DateTime.parse(json['dateDepart']),
+      voyageurs: (json['voyageurs'] as num).toInt(),
+      formule: json['formule'],
+    );
+  }
   // Convertir la réservation en JSON
   Map<String, dynamic> toJson() {
     return {
