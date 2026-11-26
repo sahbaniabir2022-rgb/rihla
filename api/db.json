@@ -65,24 +65,7 @@
       "prix": 260,
       "duree": "2 jours",
       "description": "Médina fortifiée et longues plages."
-    },
-    {
-      "email": "client.test@example.com",
-      "password": "$2b$10$D1tSI0cbyFIdrXxifwLIOgbjioOL1kmX0QQzybuxn4U4W6OpaZoK",
-      "id": "IiTdLqdHq8o"
-    },
-    {
-      "destinationId": "2",
-      "nom": "Test",
-      "email": "test@mail.tn",
-      "telephone": "22123456",
-      "dateDepart": "2026-12-15T00:00:00.000",
-      "voyageurs": 2,
-      "formule": "Confort",
-      "total": 1092,
-      "id": "slHhJr5gnVE"
     }
   ],
-  "reservations": [],
-  "$schema": "./node_modules/json-server/schema.json"
-}
+  "reservations": []
+ }
